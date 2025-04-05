@@ -126,37 +126,47 @@ export default function DashboardPage() {
     setAudioUrl(null)
   }
 
-  const analyzeAudio = () => {
+  const analyzeAudio = async () => {
     if (!audioFile) return
-
     setIsAnalyzing(true)
-
-    // Simulate API call with random results
-    setTimeout(() => {
-      const genders = ["Male", "Female"]
-      const randomGender = genders[Math.floor(Math.random() * genders.length)]
-      const randomAge = Math.floor(Math.random() * 50) + 15 // Age between 15-65
-      const randomCertainty = Math.floor(Math.random() * 30) + 70 // Certainty between 70-100%
-
+  
+    const formData = new FormData()
+    formData.append("file", audioFile)
+  
+    try {
+      const response = await fetch("http://localhost:8000/analyze", {
+        method: "POST",
+        body: formData,
+      })
+  
+      if (!response.ok) {
+        throw new Error("Failed to analyze audio")
+      }
+  
+      const data = await response.json()
+  
       const result = {
         id: Date.now(),
         timestamp: new Date().toISOString(),
-        gender: randomGender,
-        age: randomAge,
-        certainty: randomCertainty,
+        gender: data.gender,
+        age: data.age,
+        certainty: data.certainty,
         audioName: audioFile.name,
       }
-
+  
       setResults(result)
-
-      // Add to history (max 5 items)
+  
       const updatedHistory = [result, ...history].slice(0, 5)
       setHistory(updatedHistory)
       localStorage.setItem("predictionHistory", JSON.stringify(updatedHistory))
-
+    } catch (error) {
+      console.error("Error analyzing audio:", error)
+      alert("Error analyzing audio. Please try again.")
+    } finally {
       setIsAnalyzing(false)
-    }, 2000)
+    }
   }
+  
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser")
@@ -346,7 +356,7 @@ export default function DashboardPage() {
 
                           <div>
                             <div className="text-sm font-medium mb-1">Estimated Age</div>
-                            <div className="text-2xl font-bold">{results.age} years</div>
+                            <div className="text-2xl font-bold">{results.age}</div>
                           </div>
 
                           <div>

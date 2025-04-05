@@ -28,7 +28,7 @@ export function HistoryList({ history }: HistoryListProps) {
           <div className="flex justify-between items-start">
             <div>
               <div className="font-medium">
-                {item.gender}, {item.age} years
+                {item.gender}, {item.age}
               </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
