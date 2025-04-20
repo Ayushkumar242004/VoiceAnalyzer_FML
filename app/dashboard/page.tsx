@@ -25,6 +25,12 @@ export default function DashboardPage() {
   const [results, setResults] = useState<any>(null)
   const [history, setHistory] = useState<any[]>([])
 
+  const [gender, setGender] = useState("")
+  const [probability, setProbability] = useState(0)
+  const [uncertaintyPercent, setUncertaintyPercent] = useState(0)
+  const [confidence, setConfidence] = useState(0)
+
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
 
@@ -134,7 +140,7 @@ export default function DashboardPage() {
     formData.append("file", audioFile)
   
     try {
-      const response = await fetch("http://localhost:8000/analyze", {
+      const response = await fetch("https://voiceagegenderpredictionback-production.up.railway.app/analyze/audio", {
         method: "POST",
         body: formData,
       })
@@ -142,8 +148,25 @@ export default function DashboardPage() {
       if (!response.ok) {
         throw new Error("Failed to analyze audio")
       }
-  
+      
+      localStorage.set("response",response);
       const data = await response.json()
+
+    // Extract required values
+    const {
+      gender_prediction: {
+        probability,
+        gender,
+        uncertainty_percent,
+        confidence
+      }
+    } = data
+
+    setProbability(probability)
+    setGender(gender)
+    setUncertaintyPercent(uncertainty_percent)
+    setConfidence(confidence)
+
   
       const result = {
         id: Date.now(),
@@ -345,27 +368,26 @@ export default function DashboardPage() {
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="flex justify-center">
-                          <CircularProgressDisplay value={results.certainty} />
+                          <CircularProgressDisplay value={uncertaintyPercent} />
                         </div>
 
                         <div className="space-y-4">
                           <div>
                             <div className="text-sm font-medium mb-1">Predicted Gender</div>
-                            <div className="text-2xl font-bold">{results.gender}</div>
+                            <div className="text-2xl font-bold">{gender}</div>
                           </div>
 
                           <div>
-                            <div className="text-sm font-medium mb-1">Estimated Age</div>
-                            <div className="text-2xl font-bold">{results.age}</div>
+                            <div className="text-sm font-medium mb-1">Probability</div>
+                            <div className="text-2xl font-bold">{probability}</div>
                           </div>
 
                           <div>
-                            <div className="text-sm font-medium mb-1">Certainty</div>
-                            <div className="flex items-center gap-2">
-                              <Progress value={results.certainty} className="h-2" />
-                              <span className="text-sm font-medium">{results.certainty}%</span>
-                            </div>
+                            <div className="text-sm font-medium mb-1">Confidence</div>
+                            <div className="text-2xl font-bold">{confidence}</div>
                           </div>
+
+                
                         </div>
                       </CardContent>
                     </Card>
