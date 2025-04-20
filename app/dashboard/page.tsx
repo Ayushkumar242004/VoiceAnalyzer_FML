@@ -148,8 +148,8 @@ export default function DashboardPage() {
       if (!response.ok) {
         throw new Error("Failed to analyze audio")
       }
+       console.log("response",response);
       
-      localStorage.set("response",response);
       const data = await response.json()
 
     // Extract required values
@@ -168,16 +168,17 @@ export default function DashboardPage() {
     setConfidence(confidence)
 
   
-      const result = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        gender: data.gender,
-        age: data.age,
-        certainty: data.certainty,
-        audioName: audioFile.name,
-      }
-  
-      setResults(result)
+    const result = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      gender,
+      probability,
+      uncertaintyPercent: uncertainty_percent,
+      confidence,
+      audioName: audioFile.name,
+    }
+
+    setResults(result)
   
       const updatedHistory = [result, ...history].slice(0, 5)
       setHistory(updatedHistory)
