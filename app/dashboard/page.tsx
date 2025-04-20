@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<any[]>([])
 
   const [gender, setGender] = useState("")
+  const[predicted_age_group,set_predicted_age_group]=useState("")
   const [probability, setProbability] = useState(0)
   const [uncertaintyPercent, setUncertaintyPercent] = useState(0)
   const [confidence, setConfidence] = useState(0)
@@ -137,10 +138,10 @@ export default function DashboardPage() {
     setIsAnalyzing(true)
   
     const formData = new FormData()
-    formData.append("file", audioFile)
+    formData.append("audio_file", audioFile)
   
     try {
-      const response = await fetch("https://voiceagegenderpredictionback-production.up.railway.app/analyze/audio", {
+      const response = await fetch("http://127.0.0.1:8000/analyze/audio", {
         method: "POST",
         body: formData,
       })
@@ -148,9 +149,9 @@ export default function DashboardPage() {
       if (!response.ok) {
         throw new Error("Failed to analyze audio")
       }
-       console.log("response",response);
       
       const data = await response.json()
+      console.log("data",data);
 
     // Extract required values
     const {
@@ -162,11 +163,19 @@ export default function DashboardPage() {
       }
     } = data
 
+    const {
+      age: {
+        predicted_age_group
+      }
+    } = data
+
+
     setProbability(probability)
     setGender(gender)
     setUncertaintyPercent(uncertainty_percent)
     setConfidence(confidence)
-
+    set_predicted_age_group(predicted_age_group)
+    console.log("confidence",confidence);
   
     const result = {
       id: Date.now(),
@@ -369,7 +378,7 @@ export default function DashboardPage() {
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="flex justify-center">
-                          <CircularProgressDisplay value={uncertaintyPercent} />
+                          <CircularProgressDisplay value={confidence} />
                         </div>
 
                         <div className="space-y-4">
@@ -384,10 +393,10 @@ export default function DashboardPage() {
                           </div>
 
                           <div>
-                            <div className="text-sm font-medium mb-1">Confidence</div>
-                            <div className="text-2xl font-bold">{confidence}</div>
+                            <div className="text-sm font-medium mb-1">Age</div>
+                            <div className="text-2xl font-bold">{predicted_age_group}</div>
                           </div>
-
+                      
                 
                         </div>
                       </CardContent>
