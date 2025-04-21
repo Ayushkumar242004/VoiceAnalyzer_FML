@@ -210,7 +210,7 @@ export default function DashboardPage() {
         console.error("Server returned error response:", errorText)
         throw new Error("Failed to analyze audio")
       }
-  
+      
       const data = await response.json()
       console.log("Response JSON:", data)
   
@@ -875,6 +875,7 @@ export default function DashboardPage() {
                       </CardHeader>
                       <CardContent className="space-y-8">
                         <div className="flex justify-center">
+                          <CircularProgressDisplay value={confidence} />
                           <CircularProgressDisplay value={confidence} />
                         </div>
 
