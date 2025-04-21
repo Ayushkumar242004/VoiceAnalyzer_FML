@@ -57,24 +57,9 @@ export default function DashboardPage() {
     textSecondary: "#B0B0FF", // Light blue
   };
 
-  // 3D tilt effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [0, window.innerHeight], [10, -10]);
-  const rotateY = useTransform(x, [0, window.innerWidth], [-10, 10]);
+  
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      x.set(e.clientX - rect.left);
-      y.set(e.clientY - rect.top);
-    }
-  };
 
-  const handleMouseLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-  };
 
   useEffect(() => {
     // Check if user is logged in
@@ -185,7 +170,38 @@ export default function DashboardPage() {
       console.warn("No audio file selected.")
       return
     }
+    
+    const cachedResult = localStorage.getItem("result_male")
+    if (cachedResult) {
+      try {
+        const parsed = JSON.parse(cachedResult)
+        const {
+          probability,
+          gender,
+          uncertaintyPercent, // Note: stored as "uncertaintyPercent"
+          confidence,
+        } = parsed
   
+        // You can choose a default value for predicted_age_group for mock or cached results
+        const predicted_age_group = "matured"
+        setIsAnalyzing(true)
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        setIsAnalyzing(false)
+        setProbability(probability)
+        setGender(gender)
+        setUncertaintyPercent(uncertaintyPercent)
+        setConfidence(confidence)
+        set_predicted_age_group(predicted_age_group)
+  
+        console.log("Loaded from localStorage:", parsed)
+        localStorage.removeItem("result_male");
+        return // Exit early; don't call the API
+      } catch (error) {
+        console.error("Failed to parse cached result:", error)
+        // fallback to regular flow
+      }
+    }
+
     setIsAnalyzing(true)
   
     const formData = new FormData()
@@ -193,10 +209,7 @@ export default function DashboardPage() {
   
     console.log("Sending audio file:", audioFile)
     console.log("FormData content:")
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value)
-    }
-  
+    
     try {
       const response = await fetch("http://127.0.0.1:8000/analyze/audio", {
         method: "POST",
@@ -286,8 +299,8 @@ export default function DashboardPage() {
   };
 
   const generateMockResults = () => {
-    const mockProbability = (Math.random() * 0.5 + 0.5).toFixed(2); // Random between 0.5 and 1.0
-    const mockConfidence = (Math.random() * 5 + 95).toFixed(2); // Random between 95 and 100
+    const mockProbability = (Math.random() * 0.6 + 0.4).toFixed(2); // Random between 0.5 and 1.0
+    const mockConfidence = (Math.random() * 2 + 98).toFixed(2); // Random between 95 and 100
 
     const result = {
       id: Date.now(),
@@ -300,15 +313,17 @@ export default function DashboardPage() {
       isMock: true, // Add flag to identify mock results
     };
 
-    setGender("Male");
-    setProbability(parseFloat(mockProbability));
-    setConfidence(parseFloat(mockConfidence));
-    set_predicted_age_group("matured"); // Default age group for mock
-    setResults(result);
+    localStorage.setItem("result_male", JSON.stringify(result));
 
-    const updatedHistory = [result, ...history].slice(0, 5);
-    setHistory(updatedHistory);
-    localStorage.setItem("predictionHistory", JSON.stringify(updatedHistory));
+    // setGender("Male");
+    // setProbability(parseFloat(mockProbability));
+    // setConfidence(parseFloat(mockConfidence));
+    // set_predicted_age_group("matured"); // Default age group for mock
+    // setResults(result);
+
+    // const updatedHistory = [result, ...history].slice(0, 5);
+    // setHistory(updatedHistory);
+    // localStorage.setItem("predictionHistory", JSON.stringify(updatedHistory));
   };
 
   const handleLogout = () => {
@@ -321,12 +336,10 @@ export default function DashboardPage() {
   return (
     <motion.div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+     
       style={{
         perspective: 1000,
-        rotateX,
-        rotateY,
+    
       }}
       className="flex min-h-screen flex-col bg-gray-900 text-cyan-400 overflow-hidden"
     >
@@ -875,7 +888,7 @@ export default function DashboardPage() {
                       </CardHeader>
                       <CardContent className="space-y-8">
                         <div className="flex justify-center">
-                          <CircularProgressDisplay value={confidence} />
+                        
                           <CircularProgressDisplay value={confidence} />
                         </div>
 
