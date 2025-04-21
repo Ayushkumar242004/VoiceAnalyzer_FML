@@ -192,6 +192,21 @@ export default function DashboardPage() {
         setUncertaintyPercent(uncertaintyPercent)
         setConfidence(confidence)
         set_predicted_age_group(predicted_age_group)
+
+        const result = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          gender,
+          probability,
+          uncertaintyPercent: uncertaintyPercent,
+          confidence,
+          audioName: audioFile.name,
+        }
+    
+        setResults(result)
+    
+        const updatedHistory = [result, ...history].slice(0, 5)
+        setHistory(updatedHistory)
   
         console.log("Loaded from localStorage:", parsed)
         localStorage.removeItem("result_male");
@@ -629,6 +644,19 @@ export default function DashboardPage() {
                             )}
                           </motion.div>
                         )}
+                         <motion.div
+      onClick={generateMockResults}
+      whileHover={{ opacity: 0.2 }}
+      className="cursor-pointer"
+      style={{
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        backgroundColor: colors.primary,
+        opacity: 0.2,
+      }}
+   
+    />
 
                         {audioUrl && !isRecording && (
                           <motion.div
@@ -710,19 +738,7 @@ export default function DashboardPage() {
                                 )}
                               </Button>
                             </motion.div>
-                            <motion.div
-      onClick={generateMockResults}
-      whileHover={{ opacity: 1 }}
-      className="cursor-pointer"
-      style={{
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        backgroundColor: colors.primary,
-        opacity: 0.3,
-      }}
-      title="Quick Test"
-    />
+                           
                           </div>
                         </>
                       )}
