@@ -67,11 +67,10 @@ export function CircularProgressDisplay({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          {Math.round(progress)}%
+          {progress.toFixed(2)}%
         </motion.span>
         <span className="text-xs text-muted-foreground">Certainty</span>
       </div>
     </div>
   )
 }
-
