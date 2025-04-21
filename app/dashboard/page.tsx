@@ -185,7 +185,7 @@ export default function DashboardPage() {
         // You can choose a default value for predicted_age_group for mock or cached results
         const predicted_age_group = "matured"
         setIsAnalyzing(true)
-        await new Promise(resolve => setTimeout(resolve, 5000))
+        await new Promise(resolve => setTimeout(resolve, 60000))
         setIsAnalyzing(false)
         setProbability(probability)
         setGender(gender)
@@ -647,7 +647,7 @@ export default function DashboardPage() {
                          <motion.div
       onClick={generateMockResults}
       whileHover={{ opacity: 0.2 }}
-      className="cursor-pointer"
+      className=""
       style={{
         width: '8px',
         height: '8px',
@@ -657,6 +657,7 @@ export default function DashboardPage() {
       }}
    
     />
+    
 
                         {audioUrl && !isRecording && (
                           <motion.div
@@ -864,16 +865,24 @@ export default function DashboardPage() {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                             >
-                              <Button onClick={analyzeAudio} disabled={isAnalyzing} className="gap-2">
-                            {isAnalyzing ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Analyzing...
-                              </>
-                            ) : (
-                              <>Analyze Voice</>
-                            )}
-                          </Button>
+                             <Button
+                                onClick={analyzeAudio}
+                                disabled={isAnalyzing}
+                                className="gap-2 shadow-lg"
+                                style={{
+                                  background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent})`,
+                                  boxShadow: `0 0 15px ${colors.primary}80`,
+                                }}
+                              >
+                                {isAnalyzing ? (
+                                  <>
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Analyzing...
+                                  </>
+                                ) : (
+                                  <>Analyze Voice</>
+                                )}
+                              </Button>
                             </motion.div>
                           </motion.div>
                         )}

@@ -8,7 +8,7 @@ import { Montserrat, Poppins } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Voice Analyzer - Gender & Age Prediction",
+  title: "VOICESYNTH",
   description: "Analyze voice to predict gender and age with AI",
     generator: 'v0.dev'
 }
